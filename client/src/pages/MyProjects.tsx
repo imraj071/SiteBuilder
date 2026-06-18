@@ -102,3 +102,5 @@ export const MyProjects = () => {
     </>
   )
 }
+
+export default MyProjects;
