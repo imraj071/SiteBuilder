@@ -2,7 +2,8 @@ import { useEffect, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import type { Project } from "../types"
 import { ArrowBigDownDashIcon, EyeIcon, EyeOffIcon, FullscreenIcon, LaptopIcon, Loader2Icon, MessageSquareIcon, SaveIcon, Smartphone, SmartphoneIcon, TabletIcon, XIcon } from "lucide-react"
-import { dummyConversations, dummyProjects } from "../assets/assets"
+import { dummyConversations, dummyProjects, dummyVersion } from "../assets/assets"
+import Sidebar from "../components/Sidebar"
 
 
 const Projects = () => {
@@ -22,7 +23,7 @@ const Projects = () => {
     const project = dummyProjects.find((project)=> project.id === projectId)
     setTimeout(()=>{
       if(project){
-        setProject({...project, conversation: dummyConversations})
+        setProject({...project, conversation: dummyConversations, versions: dummyVersion})
         setLoading(false)
         setIsGenerating(project.current_code ? false : true)
       }
@@ -68,7 +69,7 @@ const Projects = () => {
           <p className="text-xs text-gray-400 -mt-0.5">Previewing last saved version</p>
         </div>
         <div className="sm:hidden flex-1 flex justify-end">
-            {!isMenuOpen ? <MessageSquareIcon onClick={()=> setIsMenuOpen(false)} className="size-6 cursor-pointer" /> : <XIcon onClick={()=> setIsMenuOpen(true)} className="size-6 cursor-pointer" />}
+            {isMenuOpen ? <MessageSquareIcon onClick={()=> setIsMenuOpen(false)} className="size-6 cursor-pointer" /> : <XIcon onClick={()=> setIsMenuOpen(true)} className="size-6 cursor-pointer" />}
         </div>
         {/* middle */}
         <div className="hidden sm:flex gap-2 bg-gray-950 p-1.5 rounded-md">
@@ -87,7 +88,7 @@ const Projects = () => {
         </div>
       </div>
       <div className="flex-1 flex overflow-auto">
-              <div>Sidebar</div>
+              <Sidebar isMenuOpen={isMenuOpen} project={project} setProject={setProject} isGenerating={isGenerating} setIsGenerating={setIsGenerating} />
               <div className="flex-1 p-2 pl-0">
                 Project Preview
               </div>
