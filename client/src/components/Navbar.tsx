@@ -1,18 +1,23 @@
 import React from 'react'
 import { assets } from '../assets/assets';
 import { Link, useNavigate } from 'react-router-dom';
+import { authClient } from '@/lib/auth-client';
+import {UserButton} from '@daveyplate/better-auth-ui'
 
 const Navbar = () => {
 
     const [menuOpen, setMenuOpen] = React.useState(false);
 
-    const naviagte = useNavigate();
+    const navigate = useNavigate();
+
+    const {data: session} = authClient.useSession();
+
 
   return (
     <>
         <nav className="z-50 flex items-center justify-between w-full py-4 px-4 md:px-16 lg:px-24 xl:px-32 backdrop-blur border-b text-white border-slate-800">
         <Link to='/'>
-              <img src={assets.logo} alt='logo' className='h-5 sm:h-7'></img>
+              <img src={assets.logo} alt='logo' className='h-5 sm:h-7' />
           </Link>
 
           <div className="hidden md:flex items-center gap-8 transition duration-500">
@@ -24,9 +29,14 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <button onClick={()=> naviagte('/auth/signin')} className="px-6 py-1.5 max-sm:text-sm bg-indigo-600 active:scale-95 hover:bg-indigo-700 transition rounded">
+            {!session?.user ? (
+              <button onClick={()=> navigate('/auth/signin')} className="px-6 py-1.5 max-sm:text-sm bg-indigo-600 active:scale-95 hover:bg-indigo-700 transition rounded">
               Get started
-            </button>
+            </button>) 
+            : (
+              <UserButton size='icon' />
+            )
+            }
             <button id="open-menu" className="md:hidden active:scale-90 transition" onClick={() => setMenuOpen(true)} >
             <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></svg>
           </button>
@@ -50,7 +60,7 @@ const Navbar = () => {
           </div>
         )}
          {/* BACKGROUND IMAGE */}
-          <img src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/refs/heads/main/assets/hero/bg-gradient-2.png" className="absolute inset-0 -z-10 size-full opacity" alt="" />
+          <img src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/refs/heads/main/assets/hero/bg-gradient-2.png" className="absolute inset-0 -z-10 size-full opacity-100" alt="" />
 
         
     </>
