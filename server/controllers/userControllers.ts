@@ -291,4 +291,8 @@ export const togglePublish = async (req: Request, res: Response) => {
 
 }
 
+//Controller Function to Purchase Credits
+export const purchaseCredits = async (req: Request, res: Response) => {
 
+
+}
