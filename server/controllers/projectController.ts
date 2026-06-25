@@ -218,3 +218,27 @@ export const rollbackToVersion = async (req: Request, res: Response) => {
     }
 
 }
+
+//Controller Function to Delete a Project
+export const deleteProject = async (req: Request, res: Response) => {
+    
+    try{
+
+        const userId = req.userId;
+
+        const {projectId} = req.params as {projectId:string};
+
+        await prisma.websiteProject.delete({
+            where: {id: projectId, userId},
+        })
+
+        res.json({message: 'Project deleted succesfully'})
+
+
+    } catch(error: any){
+        console.log(error.code || error.message)
+        res.status(500).json({message: error.message});
+    }
+
+}
+
