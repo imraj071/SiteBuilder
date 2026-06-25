@@ -242,3 +242,33 @@ export const deleteProject = async (req: Request, res: Response) => {
 
 }
 
+//Controller Function for getting project code for preview
+export const getProjectPreview = async (req: Request, res: Response) => {
+    
+    try{
+
+        const userId = req.userId;
+        const {projectId} = req.params as {projectId:string};
+
+        if(!userId){
+            return res.status(401).json({message: 'Unauthorized'});
+        }
+
+        const project = await prisma.websiteProject.findFirst({
+            where: {id: projectId, userId},
+            include: {versions: true}
+        })
+
+        if(!project){
+            return res.status(404).json({message: 'Project not found'})
+        }
+
+        res.json({project})
+
+
+    } catch(error: any){
+        console.log(error.code || error.message)
+        res.status(500).json({message: error.message});
+    }
+
+}
