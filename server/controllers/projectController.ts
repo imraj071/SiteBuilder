@@ -161,3 +161,60 @@ export const makeRevision = async (req: Request, res: Response) => {
     }
 
 }
+
+//Controller Function to Rollback to a specific version
+export const rollbackToVersion = async (req: Request, res: Response) => {
+    
+    try{
+
+        const userId = req.userId;
+        if(!userId) {
+            return res.status(401).json({message: 'Unauthorized'});
+        }
+
+        const {projectId} = req.params as {projectId:string};
+        const {versionId} = req.params as {versionId:string};
+
+
+        const project = await prisma.websiteProject.findUnique({
+            where: {id: projectId, userId},
+            include: {versions: true}
+        })
+
+        if(!project){
+            return res.status(404).json({message: 'Project not found'});
+
+        }
+
+        const version = project.versions.find((version)=> version.id == versionId);
+
+        if(!version){
+            return res.status(404).json({message: 'Version not found'});
+
+        }
+
+        await prisma.websiteProject.update({
+            where: {id: projectId, userId},
+            data: {
+                current_code: version.code,
+                current_version_index: version.id
+            }
+        })
+
+        await prisma.conversation.create({
+            data: {
+                role: 'assistant',
+                content: "I've rolled back your website to selected version. You can now preview it",
+                projectId
+            }
+        })
+
+        res.json({message: 'Version rolled back'})
+
+
+    } catch(error: any){
+        console.log(error.code || error.message)
+        res.status(500).json({message: error.message});
+    }
+
+}
