@@ -200,3 +200,34 @@ export const createUserProject = async (req: Request, res: Response) => {
 
 }
 
+//Controller Function to get a single user project
+export const getUSerProject = async (req: Request, res: Response) => {
+
+    try{
+
+        const userId = req.userId;
+        if(!userId){
+            return res.status(401).json({message: 'Unauthorized'})
+        }
+
+        const {projectId} =  req.params as { projectId: string };
+
+        const project = await prisma.websiteProject.findUnique({
+            where: {id: projectId, userId},
+            include: {
+                conversation : {
+                    orderBy: {timestamp: 'asc'}
+                },
+                versions: {orderBy: {timestamp: 'asc'}}
+            }
+        })
+
+        res.json({project})
+
+    } catch(error: any){
+        console.log(error.code || error.message)
+        res.status(500).json({message: error.message});
+    }
+
+}
+
