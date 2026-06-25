@@ -303,7 +303,6 @@ export const getprojectById = async (req: Request, res: Response) => {
 
         const project = await prisma.websiteProject.findFirst({
             where: {id: projectId},
-            include: {user: true}
         })
 
         if(!project || project.isPublished === false || !project?.current_code){
@@ -319,3 +318,5 @@ export const getprojectById = async (req: Request, res: Response) => {
     }
 
 }
+
+
