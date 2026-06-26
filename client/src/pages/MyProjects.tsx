@@ -14,8 +14,7 @@ export const MyProjects = () => {
   const [projects, setProjects] = useState<Project[]>([])
   const navigate = useNavigate()
 
-  const {data: session } = authClient.useSession()
-  const {data: isPending } = authClient.useSession()
+  const {data: session, isPending } = authClient.useSession()
 
   const fetchProjects = async () => {
 
@@ -34,7 +33,18 @@ export const MyProjects = () => {
   }
 
   const deleteProject = async(projectId:string) => {
+    try {
+      const confirm = window.confirm('Are you sure you want to delete this project?')
+      if(!confirm) return;
 
+      const {data} = await api.delete(`/api/project/${projectId}`)
+      toast.success(data.message)
+      fetchProjects()
+      
+    } catch (error:any) {
+      console.log(error);
+      toast.error(error?.response?.data?.message || error.message)
+    }
   }
 
   useEffect(()=>{
