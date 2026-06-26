@@ -6,12 +6,16 @@ import { dummyProjects } from '../assets/assets';
 import Footer from '../components/Footer';
 import api from '@/configs/axios';
 import { toast } from 'sonner';
+import { authClient } from '@/lib/auth-client';
 
 export const MyProjects = () => {
 
   const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState<Project[]>([])
   const navigate = useNavigate()
+
+  const {data: session } = authClient.useSession()
+  const {data: isPending } = authClient.useSession()
 
   const fetchProjects = async () => {
 
@@ -34,8 +38,14 @@ export const MyProjects = () => {
   }
 
   useEffect(()=>{
-    fetchProjects();
-  },[])
+    if(session?.user && !isPending){
+      fetchProjects();
+    } else if(!isPending && !session?.user){
+      navigate('/');
+      toast('Please login to view your projects');
+    }
+      
+  },[session?.user])
 
   return (
     <>
