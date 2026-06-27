@@ -357,7 +357,7 @@ export const purchaseCredits = async (req: Request, res: Response) => {
                 product_data: {
                     name: `AiSiteBuilder - ${plan.credits} credits`
                 },
-                unit_amount: Math.floor(transaction.amount)*10
+                unit_amount: Math.floor(transaction.amount)*100
             },
             quantity: 1
             },
@@ -365,6 +365,7 @@ export const purchaseCredits = async (req: Request, res: Response) => {
         mode: 'payment',
         metadata: {
             transactionId: transaction.id,
+            userId: userId!,
             appId: 'ai-site-builder'
         },
         expires_at: Math.floor(Date.now()/1000) + 30*60, //Expires in 30 mins
