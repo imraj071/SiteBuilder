@@ -1,61 +1,99 @@
-import { Request, Response } from "express"
+import { Request, Response } from "express";
 import Stripe from "stripe";
 import prisma from "../lib/prisma.js";
 
-export const stripeWebhook = async (request: Request, response: Response) => {
-    
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string)
-    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET as string;
-    
-    if (endpointSecret) {
-    // Get the signature sent by Stripe
-    const signature = request.headers['stripe-signature'] as string;
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET as string;
 
-    let event;
+export const stripeWebhook = async (req: Request, res: Response) => {
+    const signature = req.headers["stripe-signature"] as string;
+
+    let event: Stripe.Event;
 
     try {
-      event = stripe.webhooks.constructEvent(
-        request.body,
-        signature,
-        endpointSecret
-      );
-    } catch (err:any) {
-      console.log(`⚠️ Webhook signature verification failed.`, err.message);
-      return response.sendStatus(400);
+        event = stripe.webhooks.constructEvent(
+            req.body,
+            signature,
+            endpointSecret
+        );
+    } catch (err: any) {
+        console.error("Webhook signature verification failed:", err.message);
+        return res.sendStatus(400);
     }
 
-    // Handle the event
-    switch (event.type) {
-        case 'payment_intent.succeeded':
-        const paymentIntent = event.data.object;
-        const sessionList = await stripe.checkout.sessions.list({
-            payment_intent: paymentIntent.id
-        })
+    try {
+        switch (event.type) {
 
-        const session = sessionList.data[0];
-        const {transactionId, appId} = session.metadata as {transactionId: string; appId: string}
+            case "payment_intent.succeeded": {
 
-        if(appId === 'ai-site-builder' && transactionId){
-            const transaction = await prisma.transaction.update({
-                where: {id: transactionId},
-                data: {isPaid: true}
-            })
+                const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
-            //Add credits to user data
-            await prisma.user.update({
-                where: {id: transaction.userId},
-                data: {credits: {increment: transaction.credits}}
-            })
+                const { transactionId, appId } = paymentIntent.metadata;
+
+                if (
+                    appId !== "ai-site-builder" ||
+                    !transactionId
+                ) {
+                    console.log("Ignoring unrelated payment.");
+                    break;
+                }
+
+                const transaction = await prisma.transaction.findUnique({
+                    where: {
+                        id: transactionId,
+                    },
+                });
+
+                if (!transaction) {
+                    console.error("Transaction not found:", transactionId);
+                    break;
+                }
+
+                // Idempotency
+                if (transaction.isPaid) {
+                    console.log("Transaction already processed.");
+                    break;
+                }
+
+                await prisma.$transaction([
+                    prisma.transaction.update({
+                        where: {
+                            id: transactionId,
+                        },
+                        data: {
+                            isPaid: true,
+                        },
+                    }),
+
+                    prisma.user.update({
+                        where: {
+                            id: transaction.userId,
+                        },
+                        data: {
+                            credits: {
+                                increment: transaction.credits,
+                            },
+                        },
+                    }),
+                ]);
+
+                console.log(
+                    `Payment processed successfully: ${transactionId}`
+                );
+
+                break;
+            }
+
+            default:
+                console.log(`Unhandled event: ${event.type}`);
         }
-        break;
 
-        
-        // ... handle other event types
-        default:
-        console.log(`Unhandled event type ${event.type}`);
+        return res.status(200).json({
+            received: true,
+        });
+
+    } catch (err) {
+        console.error("Webhook processing error:", err);
+        return res.sendStatus(500);
     }
-
-    // Return a response to acknowledge receipt of the event
-    response.json({received: true});
-}
-}
+};
