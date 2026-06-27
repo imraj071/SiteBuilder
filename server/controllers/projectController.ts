@@ -190,7 +190,7 @@ export const rollbackToVersion = async (req: Request, res: Response) => {
             return res.status(401).json({message: 'Unauthorized'});
         }
 
-        const {projectId, versionId} = req.params as {projectId:string; versionId: string};
+        const {projectId, versionId} = req.params as {projectId:any; versionId: any};
         
 
 
