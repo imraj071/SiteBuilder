@@ -55,7 +55,7 @@ site-builder/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/imraj071/site-builder.git
+git clone [https://github.com/imraj071/site-builder.git](https://github.com/imraj071/SiteBuilder.git)
 cd site-builder
 ```
 
