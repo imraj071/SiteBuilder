@@ -190,8 +190,8 @@ export const rollbackToVersion = async (req: Request, res: Response) => {
             return res.status(401).json({message: 'Unauthorized'});
         }
 
-        const {projectId} = req.params as {projectId:string};
-        const {versionId} = req.params as {versionId:string};
+        const {projectId, versionId} = req.params as {projectId:string; versionId: string};
+        
 
 
         const project = await prisma.websiteProject.findUnique({
