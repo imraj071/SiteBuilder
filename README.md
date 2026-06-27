@@ -74,7 +74,7 @@ Create a `.env` file in `/server`:
 DATABASE_URL=your_postgresql_connection_string
 BETTER_AUTH_SECRET=your_better_auth_secret
 BETTER_AUTH_URL=your_better_auth_url
-NODE_ENV=development
+NODE_ENV=development or production
 AI_API_KEY=your_openai_api_key
 STRIPE_SECRET_KEY=your_stripe_secret_key
 STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
