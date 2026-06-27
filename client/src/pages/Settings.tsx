@@ -1,4 +1,3 @@
-import React from 'react'
 import { AccountSettingsCards } from '@daveyplate/better-auth-ui'
 import { ChangePasswordCard } from '@daveyplate/better-auth-ui'
 import { DeleteAccountCard } from '@daveyplate/better-auth-ui'
