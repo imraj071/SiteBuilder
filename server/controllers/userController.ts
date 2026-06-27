@@ -365,7 +365,6 @@ export const purchaseCredits = async (req: Request, res: Response) => {
         mode: 'payment',
         metadata: {
             transactionId: transaction.id,
-            userId: userId!,
             appId: 'ai-site-builder'
         },
         expires_at: Math.floor(Date.now()/1000) + 30*60, //Expires in 30 mins
