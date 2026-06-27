@@ -9,6 +9,8 @@ import { stripeWebhook } from "./controllers/stripeWebhook.js";
 
 const app = express();
 
+
+
 const corsOptions = {
     origin: process.env.TRUSTED_ORIGINS?.split(',') || [],
     credentials: true,
@@ -19,7 +21,7 @@ app.use(cors(corsOptions))
 
 app.post('/api/stripe', express.raw({type: 'application/json'}), stripeWebhook)
 
-app.all('/api/auth/{*any}', toNodeHandler(auth));
+app.all('/api/auth/*any', toNodeHandler(auth));
 
 app.use(express.json({limit: '50mb'}));
 
