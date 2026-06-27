@@ -13,9 +13,8 @@ const Projects = () => {
 
   const {projectId} = useParams()
   const navigate = useNavigate()
-  const {data: session} = authClient.useSession();
-  const {data: isPending} = authClient.useSession(); 
-
+  const {data: session, isPending} = authClient.useSession();
+  
   const [project, setProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(true)
 
